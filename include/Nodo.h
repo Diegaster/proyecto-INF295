@@ -2,6 +2,7 @@
 #define NODO_H
 
 struct Nodo {
+
     int id;
 
     double x;
