@@ -1,9 +1,11 @@
 CXX = g++
 CXXFLAGS = -std=c++17 -O2
 
-SRC = src/main.cpp \
-      src/LectorInstancias.cpp \
-      src/Evaluador.cpp
+SRC = \
+src/main.cpp \
+src/LectorInstancias.cpp \
+src/Evaluador.cpp \
+src/ConstructorGreedy.cpp
 
 TARGET = mdvrptw
 
