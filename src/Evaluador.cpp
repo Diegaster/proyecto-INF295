@@ -16,8 +16,7 @@ ResultadoEvaluacion Evaluador::evaluar(
     r.penalizacionTotal = 0.0;
     r.tiempoTotal = 0.0;
 
-    r.vehiculosUsados =
-        solucion.rutas.size();
+    r.vehiculosUsados = solucion.rutas.size();
 
     r.factible = true;
 
@@ -31,30 +30,21 @@ ResultadoEvaluacion Evaluador::evaluar(
     // Revisar cada ruta
     //----------------------------------------
 
-    for(const Ruta& ruta : solucion.rutas)
-    {
+    for(const Ruta& ruta : solucion.rutas){
         int carga = 0;
 
         double tiempoActual = 0.0;
 
-        int depositoIdx =
-            instancia.depositoToIndex.at(
-                ruta.depositoId
-            );
+        int depositoIdx = instancia.depositoToIndex.at(ruta.depositoId);
 
-        int nodoAnterior =
-            depositoIdx;
+        int nodoAnterior = depositoIdx;
 
         //------------------------------------
         // Clientes
         //------------------------------------
 
-        for(int clienteId : ruta.clientes)
-        {
-            int clienteIdx =
-                instancia.clienteToIndex.at(
-                    clienteId
-                );
+        for(int clienteId : ruta.clientes){
+            int clienteIdx = instancia.clienteToIndex.at(clienteId);
 
             const Nodo& cliente =
                 instancia.nodos[clienteIdx];
@@ -78,32 +68,23 @@ ResultadoEvaluacion Evaluador::evaluar(
             // Ventana tiempo
             //--------------------------------
 
-            if(tiempoActual < cliente.e_i)
-            {
-                tiempoActual =
-                    cliente.e_i;
+            if(tiempoActual < cliente.e_i){
+                tiempoActual = cliente.e_i;
             }
 
-            else if(tiempoActual >
-                    cliente.l_i)
-            {
-                r.penalizacionTotal +=
-                    (tiempoActual -
-                     cliente.l_i);
+            else if(tiempoActual > cliente.l_i){
+                r.penalizacionTotal += (tiempoActual - cliente.l_i);
             }
 
             //--------------------------------
             // Servicio
             //--------------------------------
 
-            tiempoActual +=
-                cliente.s_i;
+            tiempoActual += cliente.s_i;
 
-            carga +=
-                cliente.demanda;
+            carga += cliente.demanda;
 
-            nodoAnterior =
-                clienteIdx;
+            nodoAnterior = clienteIdx;
         }
 
         //------------------------------------
@@ -126,20 +107,15 @@ ResultadoEvaluacion Evaluador::evaluar(
         const Nodo& deposito =
             instancia.nodos[depositoIdx];
 
-        if(tiempoActual > deposito.l_i)
-        {
-            r.penalizacionTotal +=
-                (tiempoActual -
-                 deposito.l_i);
+        if(tiempoActual > deposito.l_i){
+            r.penalizacionTotal += (tiempoActual - deposito.l_i);
         }
 
         //------------------------------------
         // Capacidad
         //------------------------------------
 
-        if(carga >
-           instancia.capacidad)
-        {
+        if(carga > instancia.capacidad){
             r.factible = false;
         }
 
@@ -150,11 +126,8 @@ ResultadoEvaluacion Evaluador::evaluar(
     // Cobertura completa
     //----------------------------------------
 
-    for(const Nodo& cliente :
-        instancia.clientes)
-    {
-        if(visitas[cliente.id] != 1)
-        {
+    for(const Nodo& cliente : instancia.clientes){
+        if(visitas[cliente.id] != 1){
             r.factible = false;
         }
     }
@@ -163,8 +136,7 @@ ResultadoEvaluacion Evaluador::evaluar(
     // Fitness
     //----------------------------------------
 
-    if(!r.factible)
-    {
+    if(!r.factible){
         r.fitness =
             std::numeric_limits<double>
             ::max();

@@ -6,12 +6,10 @@
 #include <stdexcept>
 #include <algorithm>
 
-Instancia LectorInstancias::leer(const std::string& archivo)
-{
+Instancia LectorInstancias::leer(const std::string& archivo){
     std::ifstream in(archivo);
 
-    if (!in.is_open())
-    {
+    if (!in.is_open()){
         throw std::runtime_error(
             "No se pudo abrir el archivo: " + archivo
         );
@@ -24,8 +22,7 @@ Instancia LectorInstancias::leer(const std::string& archivo)
     // Nombre de instancia
     //------------------------------------------------
 
-    while (std::getline(in, line))
-    {
+    while (std::getline(in, line)){
         if (!line.empty())
         {
             instancia.nombre = line;
@@ -37,8 +34,7 @@ Instancia LectorInstancias::leer(const std::string& archivo)
     // Parámetros generales
     //------------------------------------------------
 
-    while (std::getline(in, line))
-    {
+    while (std::getline(in, line)){
         if (line.find("DEPOSITOS:") != std::string::npos)
         {
             break;
@@ -64,8 +60,7 @@ Instancia LectorInstancias::leer(const std::string& archivo)
     // Buscar bloque DEPOSITOS
     //------------------------------------------------
 
-    while (std::getline(in, line))
-    {
+    while (std::getline(in, line)){
         if (line.find("DEPOSITOS") != std::string::npos &&
             line.find(":") == std::string::npos)
         {
@@ -83,8 +78,7 @@ Instancia LectorInstancias::leer(const std::string& archivo)
     // Leer depósitos
     //------------------------------------------------
 
-    for (int i = 0; i < instancia.numDepositos;)
-    {
+    for (int i = 0; i < instancia.numDepositos;){
         if (!std::getline(in, line))
             break;
 
@@ -99,12 +93,10 @@ Instancia LectorInstancias::leer(const std::string& archivo)
 
         ss >> idTexto;
 
-        if (idTexto[0] == 'D')
-        {
+        if (idTexto[0] == 'D'){
             d.id = std::stoi(idTexto.substr(1));
         }
-        else
-        {
+        else {
             d.id = std::stoi(idTexto);
         }
 
@@ -126,10 +118,8 @@ Instancia LectorInstancias::leer(const std::string& archivo)
     // Buscar CLIENTES
     //------------------------------------------------
 
-    while (std::getline(in, line))
-    {
-        if (line.find("CLIENTES") != std::string::npos)
-        {
+    while (std::getline(in, line)){
+        if (line.find("CLIENTES") != std::string::npos){
             break;
         }
     }
@@ -144,8 +134,7 @@ Instancia LectorInstancias::leer(const std::string& archivo)
     // Leer clientes
     //------------------------------------------------
 
-    while (std::getline(in, line))
-    {
+    while (std::getline(in, line)){
         if (line.empty())
             continue;
 
@@ -180,16 +169,14 @@ Instancia LectorInstancias::leer(const std::string& archivo)
     // Índices rápidos
     //------------------------------------------------
 
-    for (int i = 0; i < (int)instancia.nodos.size(); i++)
-    {
+    for (int i = 0; i < (int)instancia.nodos.size(); i++){
         const Nodo& n = instancia.nodos[i];
 
         if (n.esDeposito)
         {
             instancia.depositoToIndex[n.id] = i;
         }
-        else
-        {
+        else{
             instancia.clienteToIndex[n.id] = i;
         }
     }
@@ -205,10 +192,8 @@ Instancia LectorInstancias::leer(const std::string& archivo)
         std::vector<double>(N, 0.0)
     );
 
-    for (int i = 0; i < N; i++)
-    {
-        for (int j = i + 1; j < N; j++)
-        {
+    for (int i = 0; i < N; i++){
+        for (int j = i + 1; j < N; j++){
             double dx =
                 instancia.nodos[i].x -
                 instancia.nodos[j].x;

@@ -18,9 +18,7 @@ namespace
 
         int mejorDeposito = -1;
 
-        for(const auto& deposito :
-            instancia.depositos)
-        {
+        for(const auto& deposito : instancia.depositos){
             int depIdx =
                 instancia.depositoToIndex.at(
                     deposito.id
@@ -53,8 +51,7 @@ namespace
 
         int mejorCliente = -1;
 
-        for(int clienteId : noVisitados)
-        {
+        for(int clienteId : noVisitados){
             int clienteIdx =
                 instancia.clienteToIndex.at(
                     clienteId
@@ -65,8 +62,7 @@ namespace
 
             if(cargaActual +
                cliente.demanda >
-               instancia.capacidad)
-            {
+               instancia.capacidad){
                 continue;
             }
 
@@ -75,8 +71,7 @@ namespace
                 [nodoActualIdx]
                 [clienteIdx];
 
-            if(d < mejorDist)
-            {
+            if(d < mejorDist){
                 mejorDist = d;
                 mejorCliente = clienteId;
             }
@@ -99,9 +94,7 @@ Solucion ConstructorGreedy::construir(
 
     std::unordered_set<int> noVisitados;
 
-    for(const auto& cliente :
-        instancia.clientes)
-    {
+    for(const auto& cliente : instancia.clientes){
         noVisitados.insert(
             cliente.id
         );
@@ -111,8 +104,7 @@ Solucion ConstructorGreedy::construir(
     // Mientras falten clientes
     //----------------------------------
 
-    while(!noVisitados.empty())
-    {
+    while(!noVisitados.empty()){
         //----------------------------------
         // Elegir cliente semilla
         //----------------------------------
@@ -145,8 +137,7 @@ Solucion ConstructorGreedy::construir(
         // Construcción greedy
         //----------------------------------
 
-        while(true)
-        {
+        while(true){
             int siguiente =
                 clienteMasCercano(
                     instancia,
@@ -155,8 +146,7 @@ Solucion ConstructorGreedy::construir(
                     cargaActual
                 );
 
-            if(siguiente == -1)
-            {
+            if(siguiente == -1){
                 break;
             }
 
@@ -187,8 +177,7 @@ Solucion ConstructorGreedy::construir(
         // Guardar ruta
         //----------------------------------
 
-        if(!ruta.clientes.empty())
-        {
+        if(!ruta.clientes.empty()){
             solucion.rutas.push_back(
                 ruta
             );

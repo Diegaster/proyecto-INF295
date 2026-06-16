@@ -22,7 +22,6 @@ struct Instancia {
 
     std::vector<std::vector<double>> distancias;
 
-    // NUEVO
     std::unordered_map<int,int> clienteToIndex;
     std::unordered_map<int,int> depositoToIndex;
 };

@@ -4,8 +4,7 @@
 #include "Instancia.h"
 #include "Solucion.h"
 
-class ConstructorGreedy
-{
+class ConstructorGreedy{
 public:
 
     static Solucion construir(
