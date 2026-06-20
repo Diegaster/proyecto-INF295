@@ -3,6 +3,7 @@
 #include "../include/ConstructorGreedy.h"
 #include "../include/EscritorSolucion.h"
 #include "../include/TabuSearch.h"
+#include <iostream>
 
 int main()
 {
@@ -11,7 +12,7 @@ int main()
             "data/C102.txt"
         );
 
-    ConfigTabu config;
+    TabuSearch::ConfigTabu config;
     std::cout
         << "Iteraciones Tabu: ";
 
@@ -67,8 +68,7 @@ int main()
         TabuSearch::optimizar(
             instancia,
             solucion,
-            500,
-            10
+            config
         );
 
     ResultadoEvaluacion resultadoTabu =
