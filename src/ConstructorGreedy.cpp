@@ -39,19 +39,22 @@ namespace
         return mejorDeposito;
     }
 
-    int clienteMasCercano(
+    int mejorClienteGreedy(
         const Instancia& instancia,
         int nodoActualIdx,
         const std::unordered_set<int>& noVisitados,
-        int cargaActual
+        int cargaActual,
+        double tiempoActual,
+        double alpha
     )
     {
-        double mejorDist =
+        double mejorCosto =
             std::numeric_limits<double>::max();
 
         int mejorCliente = -1;
 
-        for(int clienteId : noVisitados){
+        for(int clienteId : noVisitados)
+        {
             int clienteIdx =
                 instancia.clienteToIndex.at(
                     clienteId
@@ -60,19 +63,66 @@ namespace
             const Nodo& cliente =
                 instancia.nodos[clienteIdx];
 
+            //--------------------------------
+            // capacidad
+            //--------------------------------
+
             if(cargaActual +
-               cliente.demanda >
-               instancia.capacidad){
+            cliente.demanda >
+            instancia.capacidad)
+            {
                 continue;
             }
 
-            double d =
+            //--------------------------------
+            // distancia
+            //--------------------------------
+
+            double distancia =
                 instancia.distancias
                 [nodoActualIdx]
                 [clienteIdx];
 
-            if(d < mejorDist){
-                mejorDist = d;
+            //--------------------------------
+            // llegada
+            //--------------------------------
+
+            double llegada =
+                tiempoActual + distancia;
+
+            //--------------------------------
+            // espera
+            //--------------------------------
+
+            if(llegada < cliente.e_i)
+            {
+                llegada =
+                    cliente.e_i;
+            }
+
+            //--------------------------------
+            // tardanza
+            //--------------------------------
+
+            double penalizacion = 0.0;
+
+            if(llegada > cliente.l_i)
+            {
+                penalizacion =
+                    llegada - cliente.l_i;
+            }
+
+            //--------------------------------
+            // score greedy
+            //--------------------------------
+
+            double costo =
+                distancia +
+                alpha * penalizacion;
+
+            if(costo < mejorCosto)
+            {
+                mejorCosto = costo;
                 mejorCliente = clienteId;
             }
         }
@@ -136,14 +186,16 @@ Solucion ConstructorGreedy::construir(
         //----------------------------------
         // Construcción greedy
         //----------------------------------
-
+        double tiempoActual = 0.0;
         while(true){
             int siguiente =
-                clienteMasCercano(
+                mejorClienteGreedy(
                     instancia,
                     nodoActualIdx,
                     noVisitados,
-                    cargaActual
+                    cargaActual,
+                    tiempoActual,
+                    alpha
                 );
 
             if(siguiente == -1){
@@ -154,10 +206,21 @@ Solucion ConstructorGreedy::construir(
                 instancia.clienteToIndex.at(
                     siguiente
                 );
+            
+            double distancia =
+                instancia.distancias
+                [nodoActualIdx]
+                [clienteIdx];
+
+            tiempoActual += distancia;
 
             const Nodo& cliente =
                 instancia.nodos[clienteIdx];
-
+            
+            if(tiempoActual < cliente.e_i){
+                tiempoActual =
+                    cliente.e_i;
+            }
             ruta.clientes.push_back(
                 siguiente
             );
@@ -171,6 +234,8 @@ Solucion ConstructorGreedy::construir(
             noVisitados.erase(
                 siguiente
             );
+
+            tiempoActual += cliente.s_i;
         }
 
         //----------------------------------
