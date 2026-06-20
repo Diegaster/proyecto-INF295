@@ -1,0 +1,48 @@
+Instancia: C102
+
+Fitness: 31915.1
+Factible: SI
+Distancia Total: 2679.25
+Penalizacion: 2873.58
+Vehiculos: 10
+
+Vehiculo 1
+Ruta: D2 -> 67 -> 50 -> 35 -> 56 -> 45 -> 9 -> 6 -> 4 -> 2 -> 1 -> 3 -> D2
+Carga: 160
+
+Vehiculo 2
+Ruta: D2 -> 26 -> 24 -> 7 -> 8 -> 5 -> 11 -> 61 -> 23 -> 22 -> 82 -> 85 -> D2
+Carga: 170
+
+Vehiculo 3
+Ruta: D2 -> 43 -> 72 -> 27 -> 29 -> 10 -> 28 -> 36 -> 39 -> 37 -> 34 -> 12 -> D2
+Carga: 160
+
+Vehiculo 4
+Ruta: D2 -> 57 -> 55 -> 62 -> 44 -> 30 -> 38 -> 51 -> 68 -> 59 -> 48 -> 52 -> D2
+Carga: 170
+
+Vehiculo 5
+Ruta: D2 -> 13 -> 17 -> 18 -> 19 -> 15 -> 16 -> 97 -> 80 -> D2
+Carga: 200
+
+Vehiculo 6
+Ruta: D2 -> 96 -> 90 -> 86 -> 40 -> 58 -> 84 -> 93 -> 100 -> 31 -> 47 -> D2
+Carga: 180
+
+Vehiculo 7
+Ruta: D2 -> 87 -> 41 -> 53 -> 70 -> 71 -> 92 -> 66 -> 69 -> 49 -> 21 -> D2
+Carga: 170
+
+Vehiculo 8
+Ruta: D1 -> 81 -> 78 -> 63 -> 54 -> 25 -> 14 -> 89 -> D1
+Carga: 200
+
+Vehiculo 9
+Ruta: D1 -> 32 -> 33 -> 65 -> 46 -> 60 -> 64 -> 88 -> 99 -> 94 -> 83 -> D1
+Carga: 200
+
+Vehiculo 10
+Ruta: D0 -> 20 -> 42 -> 76 -> 74 -> 73 -> 77 -> 79 -> 91 -> 95 -> 98 -> 75 -> D0
+Carga: 200
+
