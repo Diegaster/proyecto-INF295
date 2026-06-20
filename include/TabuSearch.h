@@ -14,11 +14,18 @@ class TabuSearch
 {
 public:
 
+    struct ConfigTabu{
+        int maxIteraciones = 500;
+        int tabuTenure = 10;
+
+        bool usarSwap = true;
+        bool usarRelocate = true;
+    };
+
     static Solucion optimizar(
         const Instancia& instancia,
         const Solucion& inicial,
-        int maxIteraciones = 500,
-        int tabuTenure = 10
+        const ConfigTabu& config
     );
 };
 

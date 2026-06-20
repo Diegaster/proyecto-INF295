@@ -89,8 +89,7 @@ static bool esTabu(
 Solucion TabuSearch::optimizar(
     const Instancia& instancia,
     const Solucion& inicial,
-    int maxIteraciones,
-    int tabuTenure
+    const ConfigTabu& config
 )
 {
     Solucion mejorGlobal = inicial;
@@ -105,7 +104,7 @@ Solucion TabuSearch::optimizar(
     std::deque<MovimientoTabu> tabuList;
 
     for(int iter = 0;
-        iter < maxIteraciones;
+        iter < config.maxIteraciones;
         iter++)
     {
         Solucion mejorVecino;
@@ -121,94 +120,95 @@ Solucion TabuSearch::optimizar(
         //--------------------------------------------------
         // SWAP
         //--------------------------------------------------
-
-        for(int r1 = 0;
-            r1 < (int)actual.rutas.size();
-            r1++)
-        {
-            for(int p1 = 0;
-                p1 < (int)actual.rutas[r1].clientes.size();
-                p1++)
+        if(config.usarSwap){
+            for(int r1 = 0;
+                r1 < (int)actual.rutas.size();
+                r1++)
             {
-                for(int r2 = r1;
-                    r2 < (int)actual.rutas.size();
-                    r2++)
+                for(int p1 = 0;
+                    p1 < (int)actual.rutas[r1].clientes.size();
+                    p1++)
                 {
-                    for(int p2 = 0;
-                        p2 < (int)actual.rutas[r2].clientes.size();
-                        p2++)
+                    for(int r2 = r1;
+                        r2 < (int)actual.rutas.size();
+                        r2++)
                     {
-                        if(r1 == r2 &&
-                           p1 == p2)
+                        for(int p2 = 0;
+                            p2 < (int)actual.rutas[r2].clientes.size();
+                            p2++)
                         {
-                            continue;
-                        }
+                            if(r1 == r2 &&
+                            p1 == p2)
+                            {
+                                continue;
+                            }
 
-                        int clienteA =
-                            actual.rutas[r1]
-                                  .clientes[p1];
+                            int clienteA =
+                                actual.rutas[r1]
+                                    .clientes[p1];
 
-                        int clienteB =
-                            actual.rutas[r2]
-                                  .clientes[p2];
+                            int clienteB =
+                                actual.rutas[r2]
+                                    .clientes[p2];
 
-                        MovimientoTabu mov;
+                            MovimientoTabu mov;
 
-                        mov.clienteA =
-                            clienteA;
+                            mov.clienteA =
+                                clienteA;
 
-                        mov.clienteB =
-                            clienteB;
+                            mov.clienteB =
+                                clienteB;
 
-                        Solucion vecino =
-                            aplicarSwap(
-                                actual,
-                                r1,
-                                p1,
-                                r2,
-                                p2
-                            );
+                            Solucion vecino =
+                                aplicarSwap(
+                                    actual,
+                                    r1,
+                                    p1,
+                                    r2,
+                                    p2
+                                );
 
-                        ResultadoEvaluacion eval =
-                            Evaluador::evaluar(
-                                instancia,
-                                vecino
-                            );
+                            ResultadoEvaluacion eval =
+                                Evaluador::evaluar(
+                                    instancia,
+                                    vecino
+                                );
 
-                        bool tabu =
-                            esTabu(
-                                mov,
-                                tabuList
-                            );
+                            bool tabu =
+                                esTabu(
+                                    mov,
+                                    tabuList
+                                );
 
-                        bool aspiracion =
-                            eval.fitness <
-                            mejorGlobalEval.fitness;
+                            bool aspiracion =
+                                eval.fitness <
+                                mejorGlobalEval.fitness;
 
-                        if(
-                            tabu &&
-                            !aspiracion
-                        )
-                        {
-                            continue;
-                        }
+                            if(
+                                tabu &&
+                                !aspiracion
+                            )
+                            {
+                                continue;
+                            }
 
-                        if(
-                            eval.fitness <
-                            mejorVecinoEval.fitness
-                        )
-                        {
-                            mejorVecino =
-                                vecino;
+                            if(
+                                eval.fitness <
+                                mejorVecinoEval.fitness
+                            )
+                            {
+                                mejorVecino =
+                                    vecino;
 
-                            mejorVecinoEval =
-                                eval;
+                                mejorVecinoEval =
+                                    eval;
 
-                            mejorMovimiento =
-                                mov;
+                                mejorMovimiento =
+                                    mov;
 
-                            encontrado =
-                                true;
+                                encontrado =
+                                    true;
+                            }
                         }
                     }
                 }
@@ -218,103 +218,104 @@ Solucion TabuSearch::optimizar(
         //--------------------------------------------------
         // RELOCATE
         //--------------------------------------------------
-
-        for(int r1 = 0;
-            r1 < (int)actual.rutas.size();
-            r1++)
-        {
-            if(
-                actual.rutas[r1]
-                      .clientes.size()
-                <= 1
-            )
+        if(config.usarRelocate){
+            for(int r1 = 0;
+                r1 < (int)actual.rutas.size();
+                r1++)
             {
-                continue;
-            }
-
-            for(int p1 = 0;
-                p1 < (int)actual.rutas[r1].clientes.size();
-                p1++)
-            {
-                int cliente =
+                if(
                     actual.rutas[r1]
-                          .clientes[p1];
-
-                for(int r2 = 0;
-                    r2 < (int)actual.rutas.size();
-                    r2++)
+                        .clientes.size()
+                    <= 1
+                )
                 {
-                    for(int p2 = 0;
-                        p2 <= (int)actual.rutas[r2]
-                                       .clientes.size();
-                        p2++)
+                    continue;
+                }
+
+                for(int p1 = 0;
+                    p1 < (int)actual.rutas[r1].clientes.size();
+                    p1++)
+                {
+                    int cliente =
+                        actual.rutas[r1]
+                            .clientes[p1];
+
+                    for(int r2 = 0;
+                        r2 < (int)actual.rutas.size();
+                        r2++)
                     {
-                        if(
-                            r1 == r2 &&
-                            (p2 == p1 ||
-                             p2 == p1 + 1)
-                        )
+                        for(int p2 = 0;
+                            p2 <= (int)actual.rutas[r2]
+                                        .clientes.size();
+                            p2++)
                         {
-                            continue;
-                        }
+                            if(
+                                r1 == r2 &&
+                                (p2 == p1 ||
+                                p2 == p1 + 1)
+                            )
+                            {
+                                continue;
+                            }
 
-                        MovimientoTabu mov;
+                            MovimientoTabu mov;
 
-                        mov.clienteA =
-                            cliente;
+                            mov.clienteA =
+                                cliente;
 
-                        mov.clienteB =
-                            -1;
+                            mov.clienteB =
+                                -1;
 
-                        Solucion vecino =
-                            aplicarRelocate(
-                                actual,
-                                r1,
-                                p1,
-                                r2,
-                                p2
-                            );
+                            Solucion vecino =
+                                aplicarRelocate(
+                                    actual,
+                                    r1,
+                                    p1,
+                                    r2,
+                                    p2
+                                );
 
-                        ResultadoEvaluacion eval =
-                            Evaluador::evaluar(
-                                instancia,
-                                vecino
-                            );
+                            ResultadoEvaluacion eval =
+                                Evaluador::evaluar(
+                                    instancia,
+                                    vecino
+                                );
 
-                        bool tabu =
-                            esTabu(
-                                mov,
-                                tabuList
-                            );
+                            bool tabu =
+                                esTabu(
+                                    mov,
+                                    tabuList
+                                );
 
-                        bool aspiracion =
-                            eval.fitness <
-                            mejorGlobalEval.fitness;
+                            bool aspiracion =
+                                eval.fitness <
+                                mejorGlobalEval.fitness;
 
-                        if(
-                            tabu &&
-                            !aspiracion
-                        )
-                        {
-                            continue;
-                        }
+                            if(
+                                tabu &&
+                                !aspiracion
+                            )
+                            {
+                                continue;
+                            }
 
-                        if(
-                            eval.fitness <
-                            mejorVecinoEval.fitness
-                        )
-                        {
-                            mejorVecino =
-                                vecino;
+                            if(
+                                eval.fitness <
+                                mejorVecinoEval.fitness
+                            )
+                            {
+                                mejorVecino =
+                                    vecino;
 
-                            mejorVecinoEval =
-                                eval;
+                                mejorVecinoEval =
+                                    eval;
 
-                            mejorMovimiento =
-                                mov;
+                                mejorMovimiento =
+                                    mov;
 
-                            encontrado =
-                                true;
+                                encontrado =
+                                    true;
+                            }
                         }
                     }
                 }
@@ -334,7 +335,7 @@ Solucion TabuSearch::optimizar(
 
         if(
             (int)tabuList.size() >
-            tabuTenure
+            config.tabuTenure
         )
         {
             tabuList.pop_front();

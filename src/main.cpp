@@ -11,6 +11,40 @@ int main()
             "data/C102.txt"
         );
 
+    ConfigTabu config;
+    std::cout
+        << "Iteraciones Tabu: ";
+
+    std::cin
+        >> config.maxIteraciones;
+
+    std::cout
+        << "Largo lista Tabu: ";
+
+    std::cin
+        >> config.tabuTenure;
+
+    char opcion;
+
+    std::cout
+        << "Usar Swap? (y/n): ";
+
+    std::cin
+        >> opcion;
+
+    config.usarSwap =
+        (opcion == 'y' ||
+        opcion == 'Y');
+
+    std::cout
+        << "Usar Relocate? (y/n): ";
+
+    std::cin
+        >> opcion;
+
+    config.usarRelocate =
+        (opcion == 'y' ||
+        opcion == 'Y');
     Solucion solucion =
         ConstructorGreedy::construir(
             instancia
