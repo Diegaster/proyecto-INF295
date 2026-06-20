@@ -3,16 +3,19 @@
 #include "../include/ConstructorGreedy.h"
 #include "../include/EscritorSolucion.h"
 #include "../include/TabuSearch.h"
-#include <iostream>
 
-int main()
-{
-    Instancia instancia =
-        LectorInstancias::leer(
-            "data/C102.txt"
-        );
+#include <iostream>
+#include <filesystem>
+#include <vector>
+#include <algorithm>
+
+int main(){
+    //----------------------------------------
+    // Configuración Tabu
+    //----------------------------------------
 
     TabuSearch::ConfigTabu config;
+
     std::cout
         << "Iteraciones Tabu: ";
 
@@ -35,7 +38,7 @@ int main()
 
     config.usarSwap =
         (opcion == 'y' ||
-        opcion == 'Y');
+         opcion == 'Y');
 
     std::cout
         << "Usar Relocate? (y/n): ";
@@ -45,44 +48,142 @@ int main()
 
     config.usarRelocate =
         (opcion == 'y' ||
-        opcion == 'Y');
-    Solucion solucion =
-        ConstructorGreedy::construir(
-            instancia
-        );
+         opcion == 'Y');
 
-    ResultadoEvaluacion resultado =
-        Evaluador::evaluar(
-            instancia,
-            solucion
-        );
+    if(
+        !config.usarSwap &&
+        !config.usarRelocate
+    ){
+        std::cout
+            << "Debe activar al menos un movimiento.\n";
 
-    EscritorSolucion::escribir(
-        "output/C102_greedy.txt",
-        instancia,
-        solucion,
-        resultado
+        return 1;
+    }
+
+    //----------------------------------------
+    // Buscar instancias
+    //----------------------------------------
+
+    std::vector<std::string> archivos;
+
+    for(const auto& entry :
+        std::filesystem::directory_iterator("data")){
+        if(entry.is_regular_file())
+        {
+            archivos.push_back(
+                entry.path().string()
+            );
+        }
+    }
+
+    std::sort(
+        archivos.begin(),
+        archivos.end()
     );
 
-    Solucion tabu =
-        TabuSearch::optimizar(
+    //----------------------------------------
+    // Resolver todas las instancias
+    //----------------------------------------
+
+    for(const auto& archivo : archivos){
+        std::string nombre =
+            std::filesystem::path(archivo)
+            .stem()
+            .string();
+
+        std::cout
+            << "\n====================================\n";
+
+        std::cout
+            << "Procesando "
+            << nombre
+            << "\n";
+
+        std::cout
+            << "====================================\n";
+
+        //------------------------------------
+        // Leer instancia
+        //------------------------------------
+
+        Instancia instancia =
+            LectorInstancias::leer(
+                archivo
+            );
+
+        //------------------------------------
+        // Greedy
+        //------------------------------------
+
+        Solucion solucion =
+            ConstructorGreedy::construir(
+                instancia
+            );
+
+        ResultadoEvaluacion resultado =
+            Evaluador::evaluar(
+                instancia,
+                solucion
+            );
+
+        EscritorSolucion::escribir(
+            "output/" +
+            nombre +
+            "_greedy.txt",
             instancia,
             solucion,
-            config
+            resultado
         );
 
-    ResultadoEvaluacion resultadoTabu =
-        Evaluador::evaluar(
+        //------------------------------------
+        // Tabu Search
+        //------------------------------------
+
+        Solucion tabu =
+            TabuSearch::optimizar(
+                instancia,
+                solucion,
+                config
+            );
+
+        ResultadoEvaluacion resultadoTabu =
+            Evaluador::evaluar(
+                instancia,
+                tabu
+            );
+
+        EscritorSolucion::escribir(
+            "output/" +
+            nombre +
+            "_tabu.txt",
             instancia,
-            tabu
+            tabu,
+            resultadoTabu
         );
 
-    EscritorSolucion::escribir(
-        "output/C102_tabu.txt",
-        instancia,
-        tabu,
-        resultadoTabu
-    );
+        //------------------------------------
+        // Resumen
+        //------------------------------------
+
+        std::cout
+            << "Greedy Fitness: "
+            << resultado.fitness
+            << "\n";
+
+        std::cout
+            << "Tabu Fitness: "
+            << resultadoTabu.fitness
+            << "\n";
+
+        std::cout
+            << "Mejora: "
+            << resultado.fitness -
+               resultadoTabu.fitness
+            << "\n";
+    }
+
+    std::cout
+        << "\nTodas las instancias fueron procesadas.\n";
 
     return 0;
 }
