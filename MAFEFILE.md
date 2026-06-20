@@ -6,6 +6,7 @@ src/main.cpp \
 src/LectorInstancias.cpp \
 src/Evaluador.cpp \
 src/ConstructorGreedy.cpp
+src/TabuSearch.cpp
 
 TARGET = mdvrptw
 
