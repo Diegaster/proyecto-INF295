@@ -102,11 +102,10 @@ Solucion TabuSearch::optimizar(
         );
 
     std::deque<MovimientoTabu> tabuList;
-
+    int vecinosExplorados = 0;
     for(int iter = 0;
-        iter < config.maxIteraciones;
-        iter++)
-    {
+        iter < config.factorIteraciones;
+        iter++){
         Solucion mejorVecino;
         ResultadoEvaluacion mejorVecinoEval;
 

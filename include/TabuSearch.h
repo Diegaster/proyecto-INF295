@@ -15,8 +15,11 @@ class TabuSearch
 public:
 
     struct ConfigTabu{
-        int maxIteraciones = 500;
+        int factorIteraciones = 50000;
+
         int tabuTenure = 10;
+
+        int factorVecinos = 0;
 
         bool usarSwap = true;
         bool usarRelocate = true;

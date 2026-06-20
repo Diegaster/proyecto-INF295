@@ -37,10 +37,16 @@ int main()
     TabuSearch::ConfigTabu config;
 
     std::cout
-        << "Iteraciones Tabu: ";
+        << "Factor Vecinos (0 = sin limite): ";
 
     std::cin
-        >> config.maxIteraciones;
+        >> config.factorVecinos;
+
+    std::cout
+        << "Factor Iteraciones: ";
+
+    std::cin
+        >> config.factorIteraciones;
 
     std::cout
         << "Largo lista Tabu: ";
@@ -143,8 +149,7 @@ int main()
     // Procesar instancias
     //----------------------------------------
 
-    for(const auto& archivo : archivos)
-    {
+    for(const auto& archivo : archivos){
         Instancia instancia =
             LectorInstancias::leer(
                 archivo
@@ -157,6 +162,27 @@ int main()
 
         int cantidadClientes =
             instancia.clientes.size();
+
+        TabuSearch::ConfigTabu configInstancia =
+            config;
+
+        configInstancia.factorIteraciones =
+            std::max(
+                1,
+                config.factorIteraciones /
+                cantidadClientes
+            );
+
+        if(config.factorVecinos > 0){
+            configInstancia.factorVecinos =
+                std::max(
+                    1,
+                    config.factorVecinos /
+                    cantidadClientes
+                );
+        } else {
+            configInstancia.factorVecinos = 0;
+        }    
 
         std::string carpeta =
             "output/" +
@@ -241,7 +267,7 @@ int main()
                 TabuSearch::optimizar(
                     instancia,
                     solucionGreedy,
-                    config
+                    configInstancia
                 );
 
             auto fin =
@@ -294,7 +320,7 @@ int main()
         << nombre << ","
         << cantidadClientes << ","
         << modo << ","
-        << config.maxIteraciones << ","
+        << config.factorIteraciones << ","
         << config.tabuTenure << ","
         << (config.usarSwap ? 1 : 0) << ","
         << (config.usarRelocate ? 1 : 0) << ","
