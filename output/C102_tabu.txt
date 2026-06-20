@@ -1,0 +1,20 @@
+Instancia: C102
+
+Fitness: 302.337
+Factible: SI
+Distancia Total: 152.337
+Penalizacion: 0
+Vehiculos: 3
+
+Vehiculo 1
+Ruta: D1 -> 7 -> 8 -> 10 -> 11 -> 9 -> 6 -> 4 -> 2 -> 1 -> 3 -> 5 -> D1
+Carga: 160
+
+Vehiculo 2
+Ruta: D1 -> 20 -> 24 -> 25 -> 23 -> 22 -> 21 -> D1
+Carga: 110
+
+Vehiculo 3
+Ruta: D1 -> 13 -> 17 -> 18 -> 19 -> 15 -> 16 -> 14 -> 12 -> D1
+Carga: 190
+
