@@ -1,4 +1,4 @@
-Semilla: 1782093686
+Semilla: 1782098347
 Instancia: r1_6_1
 
 Fitness: 1.19177e+06

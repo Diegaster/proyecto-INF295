@@ -1,5 +1,5 @@
 #include "../include/EscritorSolucion.h"
-
+#include "../include/Graficador.h"
 #include <fstream>
 
 void EscritorSolucion::escribir(
@@ -84,4 +84,24 @@ void EscritorSolucion::escribir(
     }
 
     out.close();
+    std::string grafico =
+        archivo;
+
+    auto pos =
+        grafico.find(".txt");
+
+    if(pos != std::string::npos)
+    {
+        grafico.replace(
+            pos,
+            4,
+            ".ppm"
+        );
+    }
+
+    Graficador::graficar(
+        grafico,
+        instancia,
+        solucion
+    );
 }
