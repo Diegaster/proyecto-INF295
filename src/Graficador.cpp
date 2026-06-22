@@ -20,14 +20,46 @@ namespace
     constexpr int HEIGHT = 1400;
 
     //--------------------------------------------------
-    // PIXEL
+    // PALETAS DE COLORES POR DEPÓSITO
+    //--------------------------------------------------
+    const Color COLORES_DEPOSITOS[] =
+    {
+        {220, 20, 60},    // Depósito 0: Gama de Rojos (Carmesí)
+        {30, 144, 255},   // Depósito 1: Gama de Azules (DodgerBlue)
+        {46, 139, 87},    // Depósito 2: Gama de Verdes (SeaGreen)
+        {255, 140, 0},    // Depósito 3: Gama de Naranjas
+        {138, 43, 226},   // Depósito 4: Gama de Púrpuras
+        {0, 191, 255},    // Depósito 5: Gama de Cyans / Celestes
+        {218, 165, 32}    // Depósito 6: Gama de Dorados
+    };
+
+    constexpr int NUM_COLORES_BASE = sizeof(COLORES_DEPOSITOS) / sizeof(Color);
+
+    // Función auxiliar para generar variaciones (tonos) de un color base
+    Color generarTonoRuta(Color base, int indiceRuta)
+    {
+        if (indiceRuta == 0) return base;
+        
+        // Modificamos la intensidad de forma controlada (atenuación/oscurecimiento)
+        float multiplicador = 1.0f - (0.18f * indiceRuta);
+        if (multiplicador < 0.35f) multiplicador = 0.35f; // Límite para evitar que se vuelva negro absoluto
+
+        return {
+            static_cast<unsigned char>(base.r * multiplicador),
+            static_cast<unsigned char>(base.g * multiplicador),
+            static_cast<unsigned char>(base.b * multiplicador)
+        };
+    }
+
+    //--------------------------------------------------
+    // PIXEL (Optimizado pasándolo por valor)
     //--------------------------------------------------
 
     void setPixel(
         std::vector<unsigned char>& img,
         int x,
         int y,
-        const Color& c
+        Color c
     )
     {
         if(x < 0 || x >= WIDTH)
@@ -53,7 +85,7 @@ namespace
         int cx,
         int cy,
         int radius,
-        const Color& c
+        Color c
     )
     {
         for(int dx = -radius;
@@ -91,7 +123,7 @@ namespace
         int cx,
         int cy,
         int half,
-        const Color& c
+        Color c
     )
     {
         for(int dx = -half;
@@ -122,7 +154,7 @@ namespace
         int y1,
         int x2,
         int y2,
-        const Color& c
+        Color c
     )
     {
         int dx =
@@ -142,19 +174,9 @@ namespace
 
         while(true)
         {
-            setPixel(
-                img,
-                x1,
-                y1,
-                c
-            );
-
-            setPixel(
-                img,
-                x1 + 1,
-                y1,
-                c
-            );
+            setPixel(img, x1, y1, c);
+            // Dibujamos un píxel adyacente para dar consistencia al grosor de la línea
+            setPixel(img, x1 + 1, y1, c);
 
             if(
                 x1 == x2 &&
@@ -229,7 +251,7 @@ namespace
         int x,
         int y,
         char c,
-        const Color& color
+        Color color
     )
     {
         auto it =
@@ -276,7 +298,7 @@ namespace
         int x,
         int y,
         const std::string& text,
-        const Color& color
+        Color color
     )
     {
         int offset = 0;
@@ -294,25 +316,8 @@ namespace
             offset += 14;
         }
     }
-
-    //--------------------------------------------------
-    // COLORES RUTAS
-    //--------------------------------------------------
-
-    Color colores[] =
-    {
-        {255,0,0},
-        {0,180,0},
-        {0,0,255},
-        {255,140,0},
-        {255,0,255},
-        {0,255,255},
-        {120,0,255},
-        {255,120,0},
-        {0,120,255},
-        {120,120,0}
-    };
 }
+
 void Graficador::graficar(
     const std::string& archivo,
     const Instancia& instancia,
@@ -330,46 +335,32 @@ void Graficador::graficar(
 
     double minX = 1e18;
     double minY = 1e18;
-
     double maxX = -1e18;
     double maxY = -1e18;
 
     for(const auto& nodo :
         instancia.nodos)
     {
-        minX =
-            std::min(
-                minX,
-                nodo.x
-            );
-
-        minY =
-            std::min(
-                minY,
-                nodo.y
-            );
-
-        maxX =
-            std::max(
-                maxX,
-                nodo.x
-            );
-
-        maxY =
-            std::max(
-                maxY,
-                nodo.y
-            );
+        minX = std::min(minX, nodo.x);
+        minY = std::min(minY, nodo.y);
+        maxX = std::max(maxX, nodo.x);
+        maxY = std::max(maxY, nodo.y);
     }
 
-    if(maxX == minX)
-        maxX += 1.0;
+    if(maxX == minX) maxX += 1.0;
+    if(maxY == minY) maxY += 1.0;
 
-    if(maxY == minY)
-        maxY += 1.0;
+    // ---- MEJORA: MARGEN DE SEGURIDAD VIRTUAL (PADDING) ----
+    // Evita que los nodos situados exactamente en el extremo queden cortados por la mitad
+    double rangoX = maxX - minX;
+    double rangoY = maxY - minY;
+    minX -= rangoX * 0.04;
+    maxX += rangoX * 0.04;
+    minY -= rangoY * 0.04;
+    maxY += rangoY * 0.04;
 
     //--------------------------------------------------
-    // MARGENES
+    // MARGENES DEL LIENZO
     //--------------------------------------------------
 
     constexpr int LEFT   = 120;
@@ -408,48 +399,17 @@ void Graficador::graficar(
             );
     };
 
-    Color negro =
-    {
-        0,0,0
-    };
+    Color negro = { 0, 0, 0 };
 
     //--------------------------------------------------
     // EJES
     //--------------------------------------------------
 
-    drawLine(
-        img,
-        LEFT,
-        HEIGHT - BOTTOM,
-        WIDTH - RIGHT,
-        HEIGHT - BOTTOM,
-        negro
-    );
+    drawLine(img, LEFT, HEIGHT - BOTTOM, WIDTH - RIGHT, HEIGHT - BOTTOM, negro);
+    drawLine(img, LEFT, HEIGHT - BOTTOM, LEFT, TOP, negro);
 
-    drawLine(
-        img,
-        LEFT,
-        HEIGHT - BOTTOM,
-        LEFT,
-        TOP,
-        negro
-    );
-
-    drawText(
-        img,
-        WIDTH - 50,
-        HEIGHT - BOTTOM + 20,
-        "X",
-        negro
-    );
-
-    drawText(
-        img,
-        30,
-        TOP - 20,
-        "Y",
-        negro
-    );
+    drawText(img, WIDTH - 50, HEIGHT - BOTTOM + 20, "X", negro);
+    drawText(img, 30, TOP - 20, "Y", negro);
 
     //--------------------------------------------------
     // GRADUACION X
@@ -457,243 +417,91 @@ void Graficador::graficar(
 
     const int divisiones = 10;
 
-    for(
-        int i = 0;
-        i <= divisiones;
-        i++
-    )
+    for(int i = 0; i <= divisiones; i++)
     {
-        int x =
-            LEFT +
-            i *
-            (WIDTH - LEFT - RIGHT)
-            /
-            divisiones;
+        int x = LEFT + i * (WIDTH - LEFT - RIGHT) / divisiones;
+        drawLine(img, x, HEIGHT - BOTTOM - 5, x, HEIGHT - BOTTOM + 5, negro);
 
-        drawLine(
-            img,
-            x,
-            HEIGHT - BOTTOM - 5,
-            x,
-            HEIGHT - BOTTOM + 5,
-            negro
-        );
-
-        int valor =
-            static_cast<int>(
-                minX +
-                i *
-                (maxX - minX)
-                /
-                divisiones
-            );
-
-        drawText(
-            img,
-            x - 10,
-            HEIGHT - BOTTOM + 20,
-            std::to_string(valor),
-            negro
-        );
+        int valor = static_cast<int>(minX + i * (maxX - minX) / divisiones);
+        drawText(img, x - 10, HEIGHT - BOTTOM + 20, std::to_string(valor), negro);
     }
 
     //--------------------------------------------------
     // GRADUACION Y
     //--------------------------------------------------
 
-    for(
-        int i = 0;
-        i <= divisiones;
-        i++
-    )
+    for(int i = 0; i <= divisiones; i++)
     {
-        int y =
-            HEIGHT -
-            (
-                BOTTOM +
-                i *
-                (HEIGHT - TOP - BOTTOM)
-                /
-                divisiones
-            );
+        int y = HEIGHT - (BOTTOM + i * (HEIGHT - TOP - BOTTOM) / divisiones);
+        drawLine(img, LEFT - 5, y, LEFT + 5, y, negro);
 
-        drawLine(
-            img,
-            LEFT - 5,
-            y,
-            LEFT + 5,
-            y,
-            negro
-        );
-
-        int valor =
-            static_cast<int>(
-                minY +
-                i *
-                (maxY - minY)
-                /
-                divisiones
-            );
-
-        drawText(
-            img,
-            10,
-            y - 5,
-            std::to_string(valor),
-            negro
-        );
+        int valor = static_cast<int>(minY + i * (maxY - minY) / divisiones);
+        drawText(img, 10, y - 5, std::to_string(valor), negro);
     }
 
     //--------------------------------------------------
-    // RUTAS
+    // RUTAS (Mejorado con colores por depósito y tonos)
     //--------------------------------------------------
 
-    int colorIdx = 0;
+    // Mapa para contar cuántas rutas hemos procesado por cada depósito (para los tonos)
+    std::unordered_map<int, int> contadorRutasPorDeposito;
 
-    for(
-        const auto& ruta :
-        solucion.rutas
-    )
+    for(const auto& ruta : solucion.rutas)
     {
-        Color color =
-            colores[
-                colorIdx %
-                (
-                    sizeof(colores)
-                    /
-                    sizeof(Color)
-                )
-            ];
+        // Encontrar el índice de orden real del depósito en la instancia
+        int depIdx = instancia.depositoToIndex.at(ruta.depositoId);
+        
+        // Seleccionamos el color base correspondiente al depósito
+        Color colorBase = COLORES_DEPOSITOS[depIdx % NUM_COLORES_BASE];
 
-        colorIdx++;
+        // Calculamos qué variación o tono le toca a esta ruta específica
+        int indiceTono = contadorRutasPorDeposito[ruta.depositoId]++;
+        Color colorRuta = generarTonoRuta(colorBase, indiceTono);
 
-        int depIdx =
-            instancia
-            .depositoToIndex
-            .at(
-                ruta.depositoId
-            );
+        const Nodo& deposito = instancia.nodos[depIdx];
 
-        const Nodo& deposito =
-            instancia
-            .nodos[
-                depIdx
-            ];
+        int prevX = normX(deposito.x);
+        int prevY = normY(deposito.y);
 
-        int prevX =
-            normX(
-                deposito.x
-            );
-
-        int prevY =
-            normY(
-                deposito.y
-            );
-
-        for(
-            int clienteId :
-            ruta.clientes
-        )
+        for(int clienteId : ruta.clientes)
         {
-            int idx =
-                instancia
-                .clienteToIndex
-                .at(
-                    clienteId
-                );
+            int idx = instancia.clienteToIndex.at(clienteId);
+            const Nodo& cliente = instancia.nodos[idx];
 
-            const Nodo& cliente =
-                instancia
-                .nodos[idx];
+            int x = normX(cliente.x);
+            int y = normY(cliente.y);
 
-            int x =
-                normX(
-                    cliente.x
-                );
-
-            int y =
-                normY(
-                    cliente.y
-                );
-
-            drawLine(
-                img,
-                prevX,
-                prevY,
-                x,
-                y,
-                color
-            );
+            drawLine(img, prevX, prevY, x, y, colorRuta);
 
             prevX = x;
             prevY = y;
         }
 
-        drawLine(
-            img,
-            prevX,
-            prevY,
-            normX(
-                deposito.x
-            ),
-            normY(
-                deposito.y
-            ),
-            color
-        );
+        // Conexión de regreso al depósito
+        drawLine(img, prevX, prevY, normX(deposito.x), normY(deposito.y), colorRuta);
     }
 
     //--------------------------------------------------
-    // NODOS
+    // NODOS (Siempre se dibujan al final por encima de las líneas)
     //--------------------------------------------------
 
-    for(
-        const auto& nodo :
-        instancia.nodos
-    )
+    for(const auto& nodo : instancia.nodos)
     {
-        int x =
-            normX(
-                nodo.x
-            );
+        int x = normX(nodo.x);
+        int y = normY(nodo.y);
 
-        int y =
-            normY(
-                nodo.y
-            );
-
-        if(
-            nodo.esDeposito
-        )
+        if(nodo.esDeposito)
         {
-            drawSquare(
-                img,
-                x,
-                y,
-                10,
-                {255,0,0}
-            );
+            int depIdx = instancia.depositoToIndex.at(nodo.id);
+            Color colorBase = COLORES_DEPOSITOS[depIdx % NUM_COLORES_BASE];
 
-            drawText(
-                img,
-                x + 15,
-                y - 10,
-                "D" +
-                std::to_string(
-                    nodo.id
-                ),
-                negro
-            );
+            // Dibujamos el depósito con su color base identificativo único
+            drawSquare(img, x, y, 10, colorBase);
+            drawText(img, x + 15, y - 10, "D" + std::to_string(nodo.id), negro);
         }
         else
         {
-            drawCircle(
-                img,
-                x,
-                y,
-                4,
-                negro
-            );
+            drawCircle(img, x, y, 4, negro);
         }
     }
 
@@ -701,83 +509,25 @@ void Graficador::graficar(
     // LEYENDA
     //--------------------------------------------------
 
-    drawText(
-        img,
-        WIDTH - 300,
-        60,
-        "LEYENDA",
-        negro
-    );
+    drawText(img, WIDTH - 300, 60, "LEYENDA", negro);
+    drawSquare(img, WIDTH - 280, 110, 10, {128, 128, 128}); // Gris genérico para la muestra
+    drawText(img, WIDTH - 240, 100, "DEPOSITO", negro);
 
-    drawSquare(
-        img,
-        WIDTH - 280,
-        110,
-        10,
-        {255,0,0}
-    );
+    drawCircle(img, WIDTH - 280, 160, 5, negro);
+    drawText(img, WIDTH - 240, 150, "CLIENTE", negro);
 
-    drawText(
-        img,
-        WIDTH - 240,
-        100,
-        "DEPOSITO",
-        negro
-    );
-
-    drawCircle(
-        img,
-        WIDTH - 280,
-        160,
-        5,
-        negro
-    );
-
-    drawText(
-        img,
-        WIDTH - 240,
-        150,
-        "CLIENTE",
-        negro
-    );
-
-    drawLine(
-        img,
-        WIDTH - 290,
-        210,
-        WIDTH - 240,
-        210,
-        {0,0,255}
-    );
-
-    drawText(
-        img,
-        WIDTH - 220,
-        200,
-        "RUTA",
-        negro
-    );
+    drawLine(img, WIDTH - 290, 210, WIDTH - 240, 210, {128, 128, 128});
+    drawText(img, WIDTH - 220, 200, "RUTA", negro);
 
     //--------------------------------------------------
-    // GUARDAR
+    // GUARDAR ARCHIVO
     //--------------------------------------------------
 
-    std::ofstream out(
-        archivo,
-        std::ios::binary
-    );
-
-    out
-        << "P6\n"
-        << WIDTH
-        << " "
-        << HEIGHT
-        << "\n255\n";
+    std::ofstream out(archivo, std::ios::binary);
+    out << "P6\n" << WIDTH << " " << HEIGHT << "\n255\n";
 
     out.write(
-        reinterpret_cast<char*>(
-            img.data()
-        ),
+        reinterpret_cast<char*>(img.data()),
         img.size()
     );
 
