@@ -23,6 +23,8 @@ public:
 
         bool usarSwap = true;
         bool usarRelocate = true;
+
+        unsigned int semilla;
     };
 
     static Solucion optimizar(

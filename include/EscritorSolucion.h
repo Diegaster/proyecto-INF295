@@ -15,7 +15,8 @@ public:
         const std::string& archivo,
         const Instancia& instancia,
         const Solucion& solucion,
-        const ResultadoEvaluacion& resultado
+        const ResultadoEvaluacion& resultado,
+        unsigned int semilla
     );
 };
 

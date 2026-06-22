@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <fstream>
 #include <chrono>
+#include <ctime>
 
 int main()
 {
@@ -41,6 +42,12 @@ int main()
 
     std::cin
         >> config.factorVecinos;
+
+    std::cout
+        << "Semilla (0 = aleatoria): ";
+
+    std::cin
+        >> config.semilla;
 
     std::cout
         << "Factor Iteraciones: ";
@@ -87,7 +94,17 @@ int main()
 
         return 1;
     }
+    if(config.semilla == 0){
+        config.semilla =
+            static_cast<unsigned int>(
+                std::time(nullptr)
+            );
+    }
 
+    std::cout
+        << "Semilla utilizada: "
+        << config.semilla
+        << "\n";
     //----------------------------------------
     // Directorios
     //----------------------------------------
@@ -108,6 +125,7 @@ int main()
     << "Instancia,"
     << "Clientes,"
     << "Modo,"
+    << "Semilla,"
     << "Iteraciones,"
     << "TabuTenure,"
     << "Swap,"
@@ -235,7 +253,8 @@ int main()
                 "_greedy.txt",
                 instancia,
                 solucionGreedy,
-                resultadoGreedy
+                resultadoGreedy,
+                0
             );
         }
 
@@ -292,7 +311,8 @@ int main()
                 "_tabu.txt",
                 instancia,
                 solucionTabu,
-                resultadoTabu
+                resultadoTabu,
+                config.semilla
             );
 
             std::cout
@@ -320,6 +340,7 @@ int main()
         << nombre << ","
         << cantidadClientes << ","
         << modo << ","
+        << config.semilla << ","
         << config.factorIteraciones << ","
         << config.tabuTenure << ","
         << (config.usarSwap ? 1 : 0) << ","

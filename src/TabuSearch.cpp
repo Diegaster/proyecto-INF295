@@ -94,9 +94,7 @@ Solucion TabuSearch::optimizar(
 )
 {
     std::mt19937 rng(
-        static_cast<unsigned>(
-            std::time(nullptr)
-        )
+        config.semilla
     );
     Solucion mejorGlobal = inicial;
     Solucion actual = inicial;

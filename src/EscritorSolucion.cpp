@@ -6,14 +6,23 @@ void EscritorSolucion::escribir(
     const std::string& archivo,
     const Instancia& instancia,
     const Solucion& solucion,
-    const ResultadoEvaluacion& resultado
+    const ResultadoEvaluacion& resultado,
+    unsigned int semilla
 )
 {
     std::ofstream out(archivo);
 
     if(!out.is_open())
         return;
-
+    if(
+        archivo.find("_tabu") !=
+        std::string::npos
+    )
+    {
+        out << "Semilla: "
+            << semilla
+            << "\n";
+    }
     out << "Instancia: "
         << instancia.nombre
         << "\n\n";
