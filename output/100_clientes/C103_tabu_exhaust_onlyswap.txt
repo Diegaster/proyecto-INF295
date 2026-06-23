@@ -1,0 +1,49 @@
+Semilla: 1782168772
+Instancia: C103
+
+Fitness: 101096
+Factible: SI
+Distancia Total: 2359.93
+Penalizacion: 9823.56
+Vehiculos: 10
+
+Vehiculo 1
+Ruta: D2 -> 5 -> 55 -> 40 -> 44 -> 75 -> 2 -> 1 -> 4 -> 22 -> 21 -> 20 -> 24 -> 26 -> 29 -> D2
+Carga: 190
+
+Vehiculo 2
+Ruta: D2 -> 11 -> 9 -> 6 -> 7 -> 28 -> 34 -> 32 -> 52 -> 47 -> 43 -> 46 -> 48 -> D2
+Carga: 200
+
+Vehiculo 3
+Ruta: D2 -> 65 -> 10 -> 30 -> 37 -> 31 -> 51 -> 50 -> 63 -> 61 -> 72 -> 90 -> 91 -> 89 -> 86 -> D2
+Carga: 200
+
+Vehiculo 4
+Ruta: D2 -> 78 -> 67 -> 62 -> 92 -> 94 -> 88 -> 100 -> 99 -> 81 -> 73 -> 71 -> D2
+Carga: 200
+
+Vehiculo 5
+Ruta: D2 -> 53 -> 38 -> 39 -> 36 -> 16 -> 19 -> 18 -> 57 -> 59 -> D2
+Carga: 200
+
+Vehiculo 6
+Ruta: D2 -> 13 -> 8 -> 15 -> 12 -> 45 -> 54 -> 60 -> 69 -> 14 -> D2
+Carga: 200
+
+Vehiculo 7
+Ruta: D2 -> 93 -> 84 -> 68 -> 80 -> 79 -> 64 -> 66 -> 98 -> 95 -> 97 -> 96 -> D2
+Carga: 200
+
+Vehiculo 8
+Ruta: D2 -> 3 -> 17 -> 42 -> 56 -> 74 -> 58 -> 23 -> 49 -> D2
+Carga: 180
+
+Vehiculo 9
+Ruta: D1 -> 87 -> 41 -> 35 -> 27 -> 25 -> 76 -> 70 -> 77 -> 85 -> 83 -> 82 -> D1
+Carga: 200
+
+Vehiculo 10
+Ruta: D0 -> 33 -> D0
+Carga: 40
+
