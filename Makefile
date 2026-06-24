@@ -9,13 +9,13 @@ TARGET = mdvrptw
 all: $(TARGET)
 
 $(TARGET): $(OBJ)
-$(CXX) $(OBJ) -o $(TARGET)
+	$(CXX) $(OBJ) -o $(TARGET)
 
 %.o: %.cpp
-$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-rm -f $(OBJ) $(TARGET)
+	rm -f $(OBJ) $(TARGET)
 
 run: $(TARGET)
-./$(TARGET)
+	./$(TARGET)
