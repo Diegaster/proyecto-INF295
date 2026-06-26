@@ -322,7 +322,8 @@ int main()
                 << "\n";
         }
 
-        /* Escritura del csv */
+        /* Escritura del csv, nota: a pesar de que se incluye la semilla por completitud en las ejecuciones
+        exhaustivas, esta no tiene ninguna función para estas ejecuciones */
 
         csv
         << nombre << ","
