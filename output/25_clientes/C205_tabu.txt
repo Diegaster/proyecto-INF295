@@ -1,0 +1,13 @@
+Semilla: 1782446812
+Instancia: C205
+
+Fitness: 1137.84
+Factible: SI
+Distancia Total: 326.029
+Penalizacion: 76.1816
+Vehiculos: 1
+
+Vehiculo 1
+Ruta: D1 -> 20 -> 22 -> 24 -> 5 -> 1 -> 2 -> 6 -> 7 -> 3 -> 4 -> 23 -> 18 -> 19 -> 16 -> 14 -> 12 -> 15 -> 17 -> 13 -> 25 -> 9 -> 11 -> 10 -> 8 -> 21 -> D1
+Carga: 460
+

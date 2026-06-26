@@ -1,0 +1,12 @@
+Instancia: C205
+
+Fitness: 459664
+Factible: SI
+Distancia Total: 327.12
+Penalizacion: 45928.6
+Vehiculos: 1
+
+Vehiculo 1
+Ruta: D1 -> 13 -> 17 -> 25 -> 9 -> 11 -> 10 -> 8 -> 21 -> 15 -> 12 -> 14 -> 16 -> 19 -> 18 -> 23 -> 4 -> 3 -> 7 -> 6 -> 1 -> 2 -> 5 -> 24 -> 22 -> 20 -> D1
+Carga: 460
+
