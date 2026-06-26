@@ -1,6 +1,6 @@
 # Proyecto MDVRP-TW - Greedy + Tabu Search
 
-## Autores
+## Autor
 
 Diego Muñoz Carrillo
 ROL: 202273578-3
@@ -61,7 +61,9 @@ Descripción:
 * `usarRelocate`: habilita operador Relocate.
 * `semilla`: semilla utilizada para exploración aleatoria.
 
-
+Es importante mencionar que ambos factores se dividen por el numero de clientes de la instancia, con el
+objetivo de optimizar el tiempo de ejecución, ya que a mayor cantidad de clientes, se expande el vecindario,
+y por ende el tiempo de ejecución
 ## Ejecución
 
 Ejecutar:
@@ -76,7 +78,7 @@ y almacenará los resultados en:
 
 output/
 
-Si se quiere ignorar alguna instancia en la ejecución sin perderla, se puede dejar en la carpeta
+Si se quiere ignorar alguna instancia en la ejecución sin perderla, se puede dejar en la carpeta:
 
 dont_use_data/
 
