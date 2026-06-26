@@ -18,9 +18,7 @@ Instancia LectorInstancias::leer(const std::string& archivo){
     Instancia instancia;
     std::string line;
 
-    //------------------------------------------------
-    // Nombre de instancia
-    //------------------------------------------------
+    /* Sacar nombre de la instancia */
 
     while (std::getline(in, line)){
         if (!line.empty())
@@ -30,9 +28,7 @@ Instancia LectorInstancias::leer(const std::string& archivo){
         }
     }
 
-    //------------------------------------------------
-    // Parámetros generales
-    //------------------------------------------------
+    /* Parametros generales entregados por la instancia */
 
     while (std::getline(in, line)){
         if (line.find("DEPOSITOS:") != std::string::npos)
@@ -43,22 +39,20 @@ Instancia LectorInstancias::leer(const std::string& archivo){
 
     {
         std::stringstream ss(line);
-
+        /* Se ignoran partes comunes de "enunciado" */
         std::string basura;
 
-        ss >> basura; // DEPOSITOS:
+        ss >> basura; /* DEPOSITOS: */
         ss >> instancia.numDepositos;
 
-        ss >> basura; // VEHICULOS_POR_DEPOSITO:
+        ss >> basura; /* VEHICULOS_POR_DEPOSITO */
         ss >> instancia.vehiculosPorDeposito;
 
-        ss >> basura; // CAPACIDAD:
+        ss >> basura; /* CAPACIDAD */
         ss >> instancia.capacidad;
     }
 
-    //------------------------------------------------
-    // Buscar bloque DEPOSITOS
-    //------------------------------------------------
+    /* Buscar bloque que contiene los depositos */
 
     while (std::getline(in, line)){
         if (line.find("DEPOSITOS") != std::string::npos &&
@@ -68,15 +62,11 @@ Instancia LectorInstancias::leer(const std::string& archivo){
         }
     }
 
-    //------------------------------------------------
-    // Saltar encabezado ID X Y ...
-    //------------------------------------------------
+    /* Saltar el encabezado */
 
     std::getline(in, line);
 
-    //------------------------------------------------
-    // Leer depósitos
-    //------------------------------------------------
+    /* Lectura de todos los depositos */
 
     for (int i = 0; i < instancia.numDepositos;){
         if (!std::getline(in, line))
@@ -114,9 +104,7 @@ Instancia LectorInstancias::leer(const std::string& archivo){
         ++i;
     }
 
-    //------------------------------------------------
-    // Buscar CLIENTES
-    //------------------------------------------------
+    /* Busqueda del bloque de Clientes */
 
     while (std::getline(in, line)){
         if (line.find("CLIENTES") != std::string::npos){
@@ -124,15 +112,11 @@ Instancia LectorInstancias::leer(const std::string& archivo){
         }
     }
 
-    //------------------------------------------------
-    // Saltar encabezado ID X Y ...
-    //------------------------------------------------
+    /* Saltar encabezado */
 
     std::getline(in, line);
 
-    //------------------------------------------------
-    // Leer clientes
-    //------------------------------------------------
+    /* Lectura de clientes */
 
     while (std::getline(in, line)){
         if (line.empty())
@@ -155,9 +139,7 @@ Instancia LectorInstancias::leer(const std::string& archivo){
         instancia.clientes.push_back(c);
     }
 
-    //------------------------------------------------
-    // Vector global de nodos
-    //------------------------------------------------
+    /* Vector global de nodos */
 
     for (const auto& d : instancia.depositos)
         instancia.nodos.push_back(d);
@@ -165,9 +147,7 @@ Instancia LectorInstancias::leer(const std::string& archivo){
     for (const auto& c : instancia.clientes)
         instancia.nodos.push_back(c);
 
-    //------------------------------------------------
-    // Índices rápidos
-    //------------------------------------------------
+    /* Actualizacion de indices rapidos */
 
     for (int i = 0; i < (int)instancia.nodos.size(); i++){
         const Nodo& n = instancia.nodos[i];
@@ -181,9 +161,7 @@ Instancia LectorInstancias::leer(const std::string& archivo){
         }
     }
 
-    //------------------------------------------------
-    // Matriz de distancias
-    //------------------------------------------------
+    /* Matriz de distancias */
 
     int N = instancia.nodos.size();
 

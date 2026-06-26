@@ -9,13 +9,13 @@
 #include <unordered_map>
 #include <cmath>
 
-// Estructura auxiliar para aplanar las coordenadas de los clientes
+/* Estructura auxiliar para aplanar las coordenadas de los clientes */
 struct PosicionCliente {
     int ruta;
     int posicion;
     int idCliente;
 };
-
+/* Funcion auxiliar para verificar si un movimiento es tabu o no */
 static bool esTabu(
     const MovimientoTabu& mov,
     const std::deque<MovimientoTabu>& lista
@@ -37,6 +37,7 @@ static bool esTabu(
     return false;
 }
 
+/* Funcion principal del TabuSearch */
 Solucion TabuSearch::optimizar(
     const Instancia& instancia,
     const Solucion& inicial,
@@ -50,22 +51,19 @@ Solucion TabuSearch::optimizar(
     ResultadoEvaluacion mejorGlobalEval = Evaluador::evaluar(instancia, mejorGlobal);
     std::deque<MovimientoTabu> tabuList;
 
-    //------------------------------------------------------------------
-    // PRECÁLCULO DE DEPÓSITO MÁS CERCANO (Aprovechando matriz de distancias)
-    //------------------------------------------------------------------
-    // Mapea: idCliente -> idDepositoMasCercano
+    /* Precalculo del deposito mas cercano, aprovechando la matriz de distancias */
     std::unordered_map<int, int> depositoIdealCliente;
 
-    for (const auto& nodoCliente : instancia.clientes) { // Iteramos directo sobre los clientes
+    for (const auto& nodoCliente : instancia.clientes) { /* Se itera sobre los clientes */
         int clienteIdx = instancia.clienteToIndex.at(nodoCliente.id);
         
         int idDepositoMasCercano = -1;
         double distanciaMinima = std::numeric_limits<double>::max();
 
-        for (const auto& nodoDeposito : instancia.depositos) { // Iteramos directo sobre los depósitos
+        for (const auto& nodoDeposito : instancia.depositos) { /* Se itera sobre los depositos */
             int depIdx = instancia.depositoToIndex.at(nodoDeposito.id);
 
-            // O(1): Consulta directa a la matriz ya calculada en memoria
+            /* O(1): Consulta directa a la matriz ya calculada en memoria */
             double distancia = instancia.distancias[depIdx][clienteIdx];
 
             if (distancia < distanciaMinima) {
@@ -76,9 +74,7 @@ Solucion TabuSearch::optimizar(
         depositoIdealCliente[nodoCliente.id] = idDepositoMasCercano;
     }
 
-    //------------------------------------------------------------------
-    // CICLO PRINCIPAL TABU SEARCH
-    //------------------------------------------------------------------
+    /* Ciclo principal del TabuSearch */
     for(int iter = 0; iter < config.factorIteraciones; iter++)
     {
         Solucion mejorVecino;
@@ -87,7 +83,7 @@ Solucion TabuSearch::optimizar(
         MovimientoTabu mejorMovimiento;
         bool encontrado = false;
 
-        // Mapeo plano de clientes para los modos exhaustivos
+        /* Mapeo plano de clientes para movimientos exhaustivos */
         std::vector<PosicionCliente> posiciones;
         if (config.factorVecinos == 0) {
             for (int r = 0; r < (int)actual.rutas.size(); r++) {
@@ -97,14 +93,12 @@ Solucion TabuSearch::optimizar(
             }
         }
 
-        //--------------------------------------------------
-        // SWAP
-        //--------------------------------------------------
+        /* Movimiento Swap */
         if(config.usarSwap){
             bool exhaustivo = (config.factorVecinos == 0);
             
             if(!exhaustivo){
-                // SWAP ALEATORIO (Sin modificar)
+                /* Swap aleatorio */
                 for(int k = 0; k < config.factorVecinos; k++)
                 {
                     int r1 = rng() % actual.rutas.size();
@@ -139,27 +133,28 @@ Solucion TabuSearch::optimizar(
                     std::swap(actual.rutas[r1].clientes[p1], actual.rutas[r2].clientes[p2]);
                 }
             } else {
-                // SWAP EXHAUSTIVO (Optimizado In-Place + Filtro de Proximidad de Depósitos)
+                /* Swap exhaustivo, la poda se realiza en base a permitir movimientos que coloquen a los clientes
+                en el deposito mas cercano para optimizar el tiempo de ejecucion */
                 for(size_t i = 0; i < posiciones.size(); i++) {
                     for(size_t j = i + 1; j < posiciones.size(); j++) {
                         const auto& posA = posiciones[i];
                         const auto& posB = posiciones[j];
 
-                        // Identificamos a qué depósitos pertenecen las rutas destino tras el intercambio
+                        /* Se identifica a qué depósitos pertenecen las rutas destino tras el intercambio */
                         int idDepRutaA = actual.rutas[posA.ruta].depositoId;
                         int idDepRutaB = actual.rutas[posB.ruta].depositoId;
 
-                        // Filtro: Tras el swap, el cliente A irá al depósito B, y el cliente B al depósito A
+                        /* Filtro: Tras el swap, el cliente A irá al depósito B, y el cliente B al depósito A */
                         bool cumpleFiltro = (depositoIdealCliente[posA.idCliente] == idDepRutaB) || 
                                             (depositoIdealCliente[posB.idCliente] == idDepRutaA);
 
                         if (!cumpleFiltro) {
-                            continue; // ✂️ Poda geométrica inmediata sin llamar al evaluador
+                            continue; /* Poda */
                         }
 
                         MovimientoTabu mov{posA.idCliente, posB.idCliente};
 
-                        // Modificación in-place
+                        /* Modificacion in-place */
                         std::swap(actual.rutas[posA.ruta].clientes[posA.posicion], actual.rutas[posB.ruta].clientes[posB.posicion]);
                         ResultadoEvaluacion eval = Evaluador::evaluar(instancia, actual);
 
@@ -173,21 +168,19 @@ Solucion TabuSearch::optimizar(
                             encontrado = true;
                         }
 
-                        // Rollback
+                        /* Rollback */
                         std::swap(actual.rutas[posA.ruta].clientes[posA.posicion], actual.rutas[posB.ruta].clientes[posB.posicion]);
                     }
                 }
             }
         }
 
-        //--------------------------------------------------
-        // RELOCATE
-        //--------------------------------------------------
+        /* Movimiento Relocate */
         if(config.usarRelocate){
             bool exhaustivo = (config.factorVecinos == 0);
             
             if (!exhaustivo){
-                // RELOCATE ALEATORIO (Sin modificar)
+                /* Relocate aleatorio */
                 for(int k = 0; k < config.factorVecinos; k++)
                 {
                     int r1 = rng() % actual.rutas.size();
@@ -219,7 +212,7 @@ Solucion TabuSearch::optimizar(
                     actual.rutas[r1].clientes.insert(actual.rutas[r1].clientes.begin() + p1, cliente);
                 }
             } else {
-                // RELOCATE EXHAUSTIVO (Optimizado In-Place + Filtro de Proximidad de Depósitos)
+                /* Relocate exhaustivo, con el mismo filtro de poda */
                 for(const auto& posA : posiciones) {
                     if(actual.rutas[posA.ruta].clientes.size() <= 1) continue;
 
@@ -230,10 +223,10 @@ Solucion TabuSearch::optimizar(
                             max_p2--; 
                         }
 
-                        // Filtro: ¿El cliente reubicado se insertará en una ruta que pertenece a su depósito ideal?
+                        /* Filtro, si el cliente se reubicara en su deposito mas cercano, se acepta */
                         int idDepRutaDestino = actual.rutas[r2].depositoId;
                         if (depositoIdealCliente[posA.idCliente] != idDepRutaDestino) {
-                            continue; // ✂️ Poda geométrica inmediata sin alterar vectores ni evaluar
+                            continue;
                         }
 
                         for(int p2 = 0; p2 <= max_p2; p2++) {
@@ -241,7 +234,7 @@ Solucion TabuSearch::optimizar(
 
                             MovimientoTabu mov{posA.idCliente, -1};
 
-                            // Modificación in-place segura
+                            /* Modificacion in-place */
                             actual.rutas[posA.ruta].clientes.erase(actual.rutas[posA.ruta].clientes.begin() + posA.posicion);
                             actual.rutas[r2].clientes.insert(actual.rutas[r2].clientes.begin() + p2, posA.idCliente);
 
@@ -257,7 +250,7 @@ Solucion TabuSearch::optimizar(
                                 encontrado = true;
                             }
 
-                            // Rollback simétrico seguro
+                            /* Rollback */
                             actual.rutas[r2].clientes.erase(actual.rutas[r2].clientes.begin() + p2);
                             actual.rutas[posA.ruta].clientes.insert(actual.rutas[posA.ruta].clientes.begin() + posA.posicion, posA.idCliente);
                         }

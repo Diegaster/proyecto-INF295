@@ -6,7 +6,8 @@
 #include "Evaluador.h"
 
 #include <string>
-
+/* Clase utilizada para la escritura de la solucion en un archivo .txt 
+Se incluye la semilla con el objetivo de que los experimentos sean reproducibles */
 class EscritorSolucion
 {
 public:

@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <limits>
 
+/* Funcion auxiliar que se encarga de evaluar la solucion, ocupada en TabuSearch */
 ResultadoEvaluacion Evaluador::evaluar(
     const Instancia& instancia,
     const Solucion& solucion,
@@ -20,15 +21,9 @@ ResultadoEvaluacion Evaluador::evaluar(
 
     r.factible = true;
 
-    //----------------------------------------
-    // Cobertura
-    //----------------------------------------
-
     std::unordered_map<int,int> visitas;
 
-    //----------------------------------------
-    // Revisar cada ruta
-    //----------------------------------------
+    /* Revision de cada ruta */
 
     for(const Ruta& ruta : solucion.rutas){
         int carga = 0;
@@ -39,9 +34,7 @@ ResultadoEvaluacion Evaluador::evaluar(
 
         int nodoAnterior = depositoIdx;
 
-        //------------------------------------
-        // Clientes
-        //------------------------------------
+        /* Revision de cada cliente de la ruta */
 
         for(int clienteId : ruta.clientes){
             int clienteIdx = instancia.clienteToIndex.at(clienteId);
@@ -51,9 +44,7 @@ ResultadoEvaluacion Evaluador::evaluar(
 
             visitas[clienteId]++;
 
-            //--------------------------------
-            // Distancia viaje
-            //--------------------------------
+            /* Distancia del viaje entre clientes o deposito/cliente*/
 
             double distancia =
                 instancia.distancias
@@ -64,9 +55,7 @@ ResultadoEvaluacion Evaluador::evaluar(
 
             tiempoActual += distancia;
 
-            //--------------------------------
-            // Ventana tiempo
-            //--------------------------------
+            /* Actualizacion de ventana de tiempo + penalizacion */
 
             if(tiempoActual < cliente.e_i){
                 tiempoActual = cliente.e_i;
@@ -76,9 +65,7 @@ ResultadoEvaluacion Evaluador::evaluar(
                 r.penalizacionTotal += (tiempoActual - cliente.l_i);
             }
 
-            //--------------------------------
-            // Servicio
-            //--------------------------------
+            /* Actualizacion del tiempo y carga por servicio*/
 
             tiempoActual += cliente.s_i;
 
@@ -87,9 +74,7 @@ ResultadoEvaluacion Evaluador::evaluar(
             nodoAnterior = clienteIdx;
         }
 
-        //------------------------------------
-        // Volver depósito
-        //------------------------------------
+        /* Contar el retorno al deposito al final de la ruta */
 
         double regreso =
             instancia.distancias
@@ -100,9 +85,8 @@ ResultadoEvaluacion Evaluador::evaluar(
 
         tiempoActual += regreso;
 
-        //------------------------------------
-        // Ventana depósito
-        //------------------------------------
+        /* Venta de deposito que corresponde al cierre de la jornada laboral, si se atrasa el vehiculo
+        se penaliza */
 
         const Nodo& deposito =
             instancia.nodos[depositoIdx];
@@ -111,9 +95,7 @@ ResultadoEvaluacion Evaluador::evaluar(
             r.penalizacionTotal += (tiempoActual - deposito.l_i);
         }
 
-        //------------------------------------
-        // Capacidad
-        //------------------------------------
+        /* Cumplimiento de la restriccion de capacidad */
 
         if(carga > instancia.capacidad){
             r.factible = false;
@@ -122,9 +104,7 @@ ResultadoEvaluacion Evaluador::evaluar(
         r.tiempoTotal += tiempoActual;
     }
 
-    //----------------------------------------
-    // Cobertura completa
-    //----------------------------------------
+    /* Restriccion de cobertura completa */
 
     for(const Nodo& cliente : instancia.clientes){
         if(visitas[cliente.id] != 1){
@@ -132,9 +112,7 @@ ResultadoEvaluacion Evaluador::evaluar(
         }
     }
 
-    //----------------------------------------
-    // Fitness
-    //----------------------------------------
+    /* Calculo del fitness */
 
     if(!r.factible){
         r.fitness =
@@ -143,7 +121,7 @@ ResultadoEvaluacion Evaluador::evaluar(
 
         return r;
     }
-
+    /* Calculo en base a la funcion de evaluacion presente en el informe */
     r.fitness =
         r.distanciaTotal
         + alpha * r.penalizacionTotal

@@ -2,6 +2,8 @@
 #include "../include/Graficador.h"
 #include <fstream>
 
+/* Se encarga de escribir la solucion de una forma visualmente atractiva, junto con los aspectos
+mas importantes*/
 void EscritorSolucion::escribir(
     const std::string& archivo,
     const Instancia& instancia,

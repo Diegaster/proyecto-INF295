@@ -5,6 +5,7 @@
 
 namespace
 {
+    /* Funcion auxiliar para obtener el deposito mas cercano a un cliente */
     int depositoMasCercano(
         const Instancia& instancia,
         int clienteId
@@ -38,7 +39,8 @@ namespace
 
         return mejorDeposito;
     }
-
+    /* La funcion se encarga de obtener al mejor cliente con Greedy, basandose mayoritariamente en la distancia 
+    entre nodos*/
     int mejorClienteGreedy(
         const Instancia& instancia,
         int nodoActualIdx,
@@ -63,10 +65,7 @@ namespace
             const Nodo& cliente =
                 instancia.nodos[clienteIdx];
 
-            //--------------------------------
-            // capacidad
-            //--------------------------------
-
+            /* Restriccion de capacidad */
             if(cargaActual +
             cliente.demanda >
             instancia.capacidad)
@@ -74,25 +73,19 @@ namespace
                 continue;
             }
 
-            //--------------------------------
-            // distancia
-            //--------------------------------
+            /* Obtencion de la distancia entre nodos */
 
             double distancia =
                 instancia.distancias
                 [nodoActualIdx]
                 [clienteIdx];
 
-            //--------------------------------
-            // llegada
-            //--------------------------------
+            /* Se guarda momentaneamente el tiempo de la llegada del vehiculo al cliente*/
 
             double llegada =
                 tiempoActual + distancia;
 
-            //--------------------------------
-            // espera
-            //--------------------------------
+            /* En caso de que el cliente llegue antes del e_i... */
 
             if(llegada < cliente.e_i)
             {
@@ -100,9 +93,7 @@ namespace
                     cliente.e_i;
             }
 
-            //--------------------------------
-            // tardanza
-            //--------------------------------
+            /* Restriccion blanda de las penalizaciones si la llegada supera el l_i */
 
             double penalizacion = 0.0;
 
@@ -112,9 +103,7 @@ namespace
                     llegada - cliente.l_i;
             }
 
-            //--------------------------------
-            // score greedy
-            //--------------------------------
+            /* Costo del cliente con Greedy */
 
             double costo =
                 distancia +
@@ -131,6 +120,7 @@ namespace
     }
 }
 
+/* Solucion que se encarga de construir el Greedy */
 Solucion ConstructorGreedy::construir(
     const Instancia& instancia,
     double alpha
@@ -138,9 +128,7 @@ Solucion ConstructorGreedy::construir(
 {
     Solucion solucion;
 
-    //----------------------------------
-    // Clientes sin visitar
-    //----------------------------------
+    /* Set de clientes sin visitar, primero los inserta todos */
 
     std::unordered_set<int> noVisitados;
 
@@ -150,14 +138,10 @@ Solucion ConstructorGreedy::construir(
         );
     }
 
-    //----------------------------------
-    // Mientras falten clientes
-    //----------------------------------
+    /* Mientras existan clientes no visitados... */
 
     while(!noVisitados.empty()){
-        //----------------------------------
-        // Elegir cliente semilla
-        //----------------------------------
+        /* Elegir cliente semilla */
 
         int clienteInicial =
             *noVisitados.begin();
@@ -183,9 +167,7 @@ Solucion ConstructorGreedy::construir(
 
         int cargaActual = 0;
 
-        //----------------------------------
-        // Construcción greedy
-        //----------------------------------
+        /* Construccion del Greedy, se parte el tiempo actual en 0 */
         double tiempoActual = 0.0;
         while(true){
             int siguiente =
@@ -238,9 +220,7 @@ Solucion ConstructorGreedy::construir(
             tiempoActual += cliente.s_i;
         }
 
-        //----------------------------------
-        // Guardar ruta
-        //----------------------------------
+        /* Guardado de ruta */
 
         if(!ruta.clientes.empty()){
             solucion.rutas.push_back(

@@ -14,9 +14,7 @@
 
 int main()
 {
-    //----------------------------------------
-    // Configuración ejecución
-    //----------------------------------------
+    /* Configuracion de la ejecucion por consola */
 
     char modo;
 
@@ -31,9 +29,7 @@ int main()
 
     modo = std::toupper(modo);
 
-    //----------------------------------------
-    // Configuración Tabu
-    //----------------------------------------
+    /* Configuracion del TabuSearch */
 
     TabuSearch::ConfigTabu config;
 
@@ -105,17 +101,13 @@ int main()
         << "Semilla utilizada: "
         << config.semilla
         << "\n";
-    //----------------------------------------
-    // Directorios
-    //----------------------------------------
+    /* Creacion de directorios */
 
     std::filesystem::create_directories(
         "output"
     );
 
-    //----------------------------------------
-    // CSV consolidado
-    //----------------------------------------
+    /* CSV consolidado que contiene todos los resultados y parametros */
 
     std::ofstream csv(
         "output/resultados.csv"
@@ -139,9 +131,7 @@ int main()
     << "VehiculosTabu,"
     << "TiempoTabuMs\n";
 
-    //----------------------------------------
-    // Buscar instancias
-    //----------------------------------------
+    /* Busqueda de instancias en la carpeta data */
 
     std::vector<std::string> archivos;
 
@@ -163,9 +153,7 @@ int main()
         archivos.end()
     );
 
-    //----------------------------------------
-    // Procesar instancias
-    //----------------------------------------
+    /* Procesado de instancias */
 
     for(const auto& archivo : archivos){
         Instancia instancia =
@@ -183,14 +171,18 @@ int main()
 
         TabuSearch::ConfigTabu configInstancia =
             config;
-
+        
+        /* Calculo del maximo de iteraciones permitidas segun el numero de clientes */
         configInstancia.factorIteraciones =
             std::max(
                 1,
                 config.factorIteraciones /
                 cantidadClientes
             );
+        
 
+        /* Calculo del maximo de vecinos para cada instancia segun el numero de clientes
+        Si es 0, no hay limite */
         if(config.factorVecinos > 0){
             configInstancia.factorVecinos =
                 std::max(
@@ -226,9 +218,7 @@ int main()
             << cantidadClientes
             << "\n";
 
-        //------------------------------------
-        // Greedy
-        //------------------------------------
+        /* Greedy */
 
         Solucion solucionGreedy =
             ConstructorGreedy::construir(
@@ -240,7 +230,9 @@ int main()
                 instancia,
                 solucionGreedy
             );
-
+        
+        /* No se ocupa el condicional antes para incluir los resultados de Greedy y la comparativa con Tabu
+        (mejora) en el csv */
         if(
             modo == 'G' ||
             modo == 'A'
@@ -258,9 +250,7 @@ int main()
             );
         }
 
-        //------------------------------------
-        // Tabu
-        //------------------------------------
+        /* Tabu */
 
         ResultadoEvaluacion resultadoTabu;
         resultadoTabu.fitness =
@@ -332,9 +322,7 @@ int main()
                 << "\n";
         }
 
-        //------------------------------------
-        // CSV
-        //------------------------------------
+        /* Escritura del csv */
 
         csv
         << nombre << ","
