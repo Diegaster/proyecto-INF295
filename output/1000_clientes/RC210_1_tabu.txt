@@ -1,4 +1,4 @@
-Semilla: 1782446812
+Semilla: 1782448925
 Instancia: rc210_1
 
 Fitness: 1.70883e+07

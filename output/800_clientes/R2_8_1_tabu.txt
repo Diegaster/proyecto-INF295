@@ -1,4 +1,4 @@
-Semilla: 1782446812
+Semilla: 1782448925
 Instancia: r2_8_1
 
 Fitness: 1.49723e+07

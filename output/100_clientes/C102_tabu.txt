@@ -1,4 +1,4 @@
-Semilla: 1782446812
+Semilla: 1782448925
 Instancia: C102
 
 Fitness: 15142.5
