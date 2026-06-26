@@ -17,16 +17,6 @@ make 4+
 
 No requiere librerías externas.
 
-## Compilación
-
-Desde la carpeta raíz del proyecto ejecutar:
-
-make
-
-Se generará el ejecutable:
-
-./mdvrptw
-
 ## Estructura del Proyecto
 
 ├── src/
@@ -64,17 +54,22 @@ Descripción:
 Es importante mencionar que ambos factores se dividen por el numero de clientes de la instancia, con el
 objetivo de optimizar el tiempo de ejecución, ya que a mayor cantidad de clientes, se expande el vecindario,
 y por ende el tiempo de ejecución
-## Ejecución
+## Compilación y Ejecución
 
-Ejecutar:
+El programa se puede compilar y ejecutar con los comandos incluidos en el Makefile, cerciorándose de que
+se esté en la misma carpeta raíz del proyecto.
 
-./mdvrptw
+Primero se debe de ejecutar: make all
 
-El programa procesará las instancias disponibles en la carpeta:
+Luego: make run
 
-data/
+Aquí es donde se ejecutará la implementación y se irán pidiendo valores de los parámetros de configuración
+mediante la consola/terminal. Una vez que se ingresen todos, el programa ejecutará Greedy, Tabu Search o ambos
+para todas las instancias que se encuentren en la carpeta data/.
 
-y almacenará los resultados en:
+Una vez que se haya terminado con las pruebas de ejecución, se puede ocupar el comando: make clean
+
+El programa almacenará los resultados en:
 
 output/
 
@@ -86,8 +81,8 @@ dont_use_data/
 
 Para cada instancia se generan:
 
-* Solución Greedy.
-* Solución Tabu Search.
+* Solución Greedy en un .txt. (Si se pide por consola)
+* Solución Tabu Search en un .txt. (Si se pide por consola)
 * Métricas de evaluación.
-* Archivos CSV consolidados.
+* Archivo CSV consolidado, con un "resumen" de todas las instancias ejecutadas.
 * Visualización de rutas en formato PPM, se ocupó Adobe Photoshop para poder visualizar los archivos PPM.
